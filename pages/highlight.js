@@ -1,4 +1,4 @@
-const ACCENT = "#00F2FF";
+const ACCENT = "#00C47A";
 
 export class HighlightBox {
   constructor() {

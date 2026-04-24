@@ -429,26 +429,49 @@ $("spChatInput").addEventListener("keydown", e => { if (e.key === "Enter") sendC
 
 function addMsg(role, text) {
   const div = document.createElement("div");
-  div.className   = role === "user" ? "chat-msg-user" : "chat-msg-ai";
+  div.className = role === "user" ? "chat-msg-user" : "chat-msg-ai";
+  div.style.whiteSpace = "pre-wrap";
   div.textContent = text;
-  $("spChatList").appendChild(div);
-  $("spChatList").scrollTo({ top: $("spChatList").scrollHeight, behavior: "smooth" });
+
+  // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+  const chatList = $("spChatList");
+  if (chatList) {
+    chatList.appendChild(div);
+    chatList.scrollTo({
+      top: chatList.scrollHeight,
+      behavior: "smooth"
+    });
+  }
+  // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
 }
 
 async function sendChat() {
-  const text = ($("spChatInput").value||"").trim();
+  const text = ($("spChatInput").value || "").trim();
   if (!text) return;
-  addMsg("user", text); $("spChatInput").value = "";
+
+  addMsg("user", text);
+  $("spChatInput").value = "";
+
   try {
-    const res = await chrome.runtime.sendMessage({ type:"quanty:aiChat", text, lang: state.lang||"en", tasks: state.tasks.slice(0,8) });
-    if (res?.ok && res.reply) { addMsg("ai", res.reply); return; }
-  } catch { /* fall through */ }
-  try {
-    const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 22000);
-    const r = await fetch(`${PROXY_URL}/api/chat`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ text, lang: "en", tasks: state.tasks.slice(0,8).map(t=>t.title||t.text) }), signal: ctrl.signal });
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 22000);
+
+    const r = await fetch(`${PROXY_URL}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text,
+        // lang: "en" ← УДАЛИЛИ
+        tasks: state.tasks.slice(0, 8).map(t => t.title || t.text)
+      }),
+      signal: ctrl.signal,
+    });
+
     const d = await r.json();
     addMsg("ai", d.reply || "No response.");
-  } catch { addMsg("ai", "Could not reach AI. Check your connection."); }
+  } catch {
+    addMsg("ai", "Could not reach AI. Check your connection.");
+  }
 }
 
 // ── RENDER ────────────────────────────────────────────────────
@@ -521,4 +544,83 @@ async function init() {
   startTimerLoop();
   $("spLogo")?.addEventListener("error", e => { e.target.style.display = "none"; });
 }
+
 init().catch(console.error);
+
+    checkOnboarding();   // ← добавь эту строку
+// ====================== ONBOARDING (TabAI-style) ======================
+const onboardingSteps = [
+  { selector: "#spGoalText, #spGoalInput", title: "🎯 Your main goal", text: "Here you set the goal that Quanty will use to keep you focused." },
+  { selector: "#spTasks", title: "📋 Daily tasks", text: "The AI automatically breaks your goal into small, manageable steps. Each day — one task." },
+  { selector: "#spFocusBtn", title: "▶ Start Focus", text: "The heart of Quanty. Click to start the timer and activate all distractions blocking." },
+  { selector: "#spProgressFill", title: "📊 Progress", text: "When you reach 100% — you've genuinely made progress toward your goal." }
+];
+
+let currentOnboardingStep = 0;
+let highlightBox = null;
+let tooltipEl = null;
+
+function createOnboardingOverlay() {
+  if (document.getElementById("quanty-onboarding-overlay")) return;
+  const html = `
+    <div id="quanty-onboarding-overlay"></div>
+    <div id="highlight-box" class="highlight-box"></div>
+    <div id="onboarding-tooltip"></div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", html);
+  highlightBox = document.getElementById("highlight-box");
+  tooltipEl = document.getElementById("onboarding-tooltip");
+}
+
+function showOnboardingStep(index) {
+  if (!highlightBox || !tooltipEl) return;
+  const step = onboardingSteps[index];
+  const el = document.querySelector(step.selector);
+  if (!el) return finishOnboarding();
+
+  const rect = el.getBoundingClientRect();
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+  highlightBox.style.top = `${rect.top + scrollTop - 8}px`;
+  highlightBox.style.left = `${rect.left - 8}px`;
+  highlightBox.style.width = `${rect.width + 16}px`;
+  highlightBox.style.height = `${rect.height + 16}px`;
+
+  tooltipEl.innerHTML = `
+    <div style="font-weight:800;margin-bottom:8px;color:#00C47A;">${step.title}</div>
+    <div>${step.text}</div>
+    <button id="onboarding-next-btn">${index === onboardingSteps.length-1 ? 'Done! Start Quanty' : 'Next →'}</button>
+  `;
+
+  const btn = tooltipEl.querySelector("#onboarding-next-btn");
+  btn.onclick = () => index < onboardingSteps.length-1 ? showOnboardingStep(index+1) : finishOnboarding();
+
+  tooltipEl.style.opacity = "0";
+  setTimeout(() => {
+    tooltipEl.style.top = `${rect.bottom + scrollTop + 20}px`;
+    tooltipEl.style.left = `${Math.min(rect.left, window.innerWidth - 300)}px`;
+    tooltipEl.style.opacity = "1";
+  }, 50);
+}
+
+async function checkOnboarding() {
+  const { onboarded } = await chrome.storage.local.get("onboarded");
+  if (onboarded === true) return;
+
+  createOnboardingOverlay();
+  currentOnboardingStep = 0;
+  showOnboardingStep(0);
+}
+
+async function finishOnboarding() {
+  await chrome.storage.local.set({ onboarded: true });
+  const overlay = document.getElementById("quanty-onboarding-overlay");
+  const box = document.getElementById("highlight-box");
+  const tooltip = document.getElementById("onboarding-tooltip");
+  if (overlay) overlay.style.opacity = "0";
+  if (box) box.style.opacity = "0";
+  if (tooltip) tooltip.style.opacity = "0";
+  setTimeout(() => {
+    overlay?.remove(); box?.remove(); tooltip?.remove();
+  }, 400);
+}

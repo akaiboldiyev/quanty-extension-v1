@@ -294,25 +294,30 @@ async function closeDistractingTabs() {
 }
 
 // ── AI: Chat reply ───────────────────────────────────────────
+// ── AI: Chat reply ───────────────────────────────────────────
 async function aiChatReply({ text, tasks }) {
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 22000);
+
     const r = await fetch(`${PROXY}/api/chat`, {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({
+      body: JSON.stringify({
         text,
-        lang:  "en",
+        // lang: "en" ← УДАЛИЛИ
         tasks: tasks.slice(0, 8).map(t => t.title || t.text || ""),
       }),
       signal: ctrl.signal,
     });
+
     if (r.ok) {
       const data = await r.json();
       if (data.reply) return data.reply;
     }
-  } catch { /* fall through */ }
+  } catch {
+    /* fall through */
+  }
   return "Focus on your current task. Small consistent steps beat big plans.";
 }
 
@@ -323,7 +328,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     if (msg.type === "quanty:getSettings") {
       sendResponse({ ok: true, settings: await getSettings() });
-      return;
+      return; 
     }
 
     if (msg.type === "quanty:setSettings") {
@@ -473,12 +478,27 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 // ── install / startup ────────────────────────────────────────
-chrome.runtime.onInstalled.addListener(async () => {
+// ── install / startup ────────────────────────────────────────
+chrome.runtime.onInstalled.addListener(async (details) => {
+  // Инициализация настроек
   const { settings, proof } = await storageGet([STORAGE_KEYS.settings, STORAGE_KEYS.proof]);
   if (!settings) await storageSet({ [STORAGE_KEYS.settings]: getDefaultSettings() });
   if (!proof) {
     await setProof({ required: false, taskId: null, taskTitle: "", question: "", questionCreatedAt: 0, unlockUntilMs: 0, nextAttemptAfterMs: 0, nextAttemptDay: "" });
   }
-  try { await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }); } catch { /* ignore */ }
+
+  // Открываем sidepanel сразу после установки + запускаем онбординг
+  try {
+    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+    
+    // Открываем sidepanel новому пользователю
+    if (details.reason === 'install') {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs[0]) {
+        await chrome.sidePanel.open({ windowId: tabs[0].windowId });
+      }
+    }
+  } catch (e) { /* ignore */ }
+
   fetch(`${PROXY}/api/health`, { method: "GET" }).catch(() => {});
 });

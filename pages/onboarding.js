@@ -1,5 +1,5 @@
 // onboarding.js — guided tour for home page
-// Highlights each UI element with animated #00F2FF border.
+// Highlights each UI element with animated #00C47A border.
 
 import { HighlightBox } from "./highlight.js";
 

@@ -525,3 +525,26 @@ body.theme-light .chat-msg-user { color: #fff; }
    UTILS
    ══════════════════════════════════════ */
 .hidden { display: none !important; }
+
+#quanty-onboarding-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(24, 26, 28, 0.92); z-index: 99999;
+  transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.highlight-box {
+  position: absolute; border: 3px solid #00C47A; border-radius: 12px;
+  box-shadow: 0 0 0 6px rgba(0, 242, 255, 0.15), 0 0 30px rgba(0, 242, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 100000;
+}
+
+#onboarding-tooltip {
+  position: absolute; background: #181A1C; color: #fff; padding: 18px 22px;
+  border-radius: 14px; border: 2px solid #00C47A; max-width: 280px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6); font-size: 14px; z-index: 100001;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#onboarding-tooltip button {
+  margin-top: 14px; background: #00C47A; color: #181A1C; border: none;
+  padding: 10px 24px; border-radius: 9999px; font-weight: 700; width: 100%;
+}
