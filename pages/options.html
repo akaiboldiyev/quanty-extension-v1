@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quanty — Options</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700;9..40,900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="brand">
+        <div class="mark">Q</div>
+        <div>
+          <h1>Quanty</h1>
+          <p>Extension settings</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="saveBtn" class="btn primary">Save</button>
+        <button id="resetTodayBtn" class="btn">Reset today</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>API Key</h2>
+      <p class="hint">Needed for AI features (Gemini).</p>
+      <input id="apiKeyInput" class="input" type="password" placeholder="AIza..." style="margin-top:10px;" />
+    </section>
+
+    <section class="card">
+      <h2>Blocking</h2>
+      <label class="lbl">Blocked domains</label>
+      <div class="row">
+        <input id="domainInput" class="input" placeholder="e.g. tiktok.com" />
+        <button id="addDomainBtn" class="btn">Add</button>
+      </div>
+      <div id="domains" class="chips"></div>
+
+      <div class="grid" style="margin-top:14px;">
+        <div>
+          <label class="lbl">Stage 1 grace (seconds)</label>
+          <input id="stage1GraceSeconds" class="input" type="number" min="0" max="300" />
+        </div>
+        <div>
+          <label class="lbl">Stage 2 wait (seconds)</label>
+          <input id="stage2WaitSeconds" class="input" type="number" min="0" max="60" />
+        </div>
+        <div>
+          <label class="lbl">Daily limit (minutes)</label>
+          <input id="dailyLimitMinutes" class="input" type="number" min="0" max="1440" />
+        </div>
+      </div>
+
+      <label class="chk" style="margin-top:14px;">
+        <input id="redirectAlwaysOn" type="checkbox" />
+        <span>Always redirect on blocked domains (hard mode)</span>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Block level</h2>
+      <p class="hint" style="margin-bottom:12px;">Controls how strictly distractions are blocked.</p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" data-level="easy"   id="lvlEasy">🟢 Easy</button>
+        <button class="btn" data-level="medium" id="lvlMedium">🟡 Medium</button>
+        <button class="btn" data-level="hard"   id="lvlHard">🔴 Hard</button>
+      </div>
+      <p class="hint" style="margin-top:10px;" id="lvlDesc">Medium: focus check overlay + YouTube cleanup</p>
+    </section>
+
+    <section class="card">
+      <h2>Goal context</h2>
+      <label class="lbl">Goal</label>
+      <input id="goal" class="input" placeholder="Your goal…" />
+      <label class="lbl" style="margin-top:12px;">Current task</label>
+      <input id="currentTask" class="input" placeholder="What you should be doing now…" />
+    </section>
+  </div>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

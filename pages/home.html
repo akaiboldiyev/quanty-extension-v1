@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quanty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <script src="../assets/lucide.min.js"></script>
+  <link rel="stylesheet" href="home.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar__left">
+      <div class="logo-mark">
+        <img src="../assets/Q.png" alt="Quanty Logo" class="logo-img" id="homeLogo">
+      </div>
+      <span class="logo-text">Quanty</span>
+      <div class="topbar__goal" id="headerGoal" hidden>
+        <span class="topbar-goal-label">Goal</span>
+        <span class="topbar-goal-text" id="headerGoalText"></span>
+      </div>
+    </div>
+    <div class="topbar__right">
+      <button type="button" class="topbar-ghost-btn" id="reportBugBtn">
+        <i data-lucide="bug"></i>
+        <span>Report a bug</span>
+      </button>
+      <button type="button" class="topbar-icon-btn" id="themeBtn" aria-label="Toggle theme">
+        <i data-lucide="sun" id="themeIcon"></i>
+      </button>
+      <button type="button" class="btn-login" id="loginBtn">
+        <i data-lucide="user"></i>
+        Login
+      </button>
+    </div>
+  </header>
+ 
+  <div class="app-body">
+ 
+    <aside class="sidebar">
+      <div class="sidebar__user">Free user</div>
+      <div class="sidebar__sep"></div>
+      <nav class="sidebar__nav" aria-label="Main navigation">
+        <button type="button" class="nav-item active" data-view="focus">
+          <i data-lucide="crosshair"></i>
+          <span>Focus</span>
+        </button>
+        <button type="button" class="nav-item" data-view="lists">
+          <i data-lucide="layout-list"></i>
+          <span>My Lists</span>
+          <span class="nav-badge" id="badgeLists">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="inbox">
+          <i data-lucide="inbox"></i>
+          <span>Inbox</span>
+          <span class="nav-badge" id="badgeInbox">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="completed">
+          <i data-lucide="check-square"></i>
+          <span>Completed</span>
+        </button>
+        <button type="button" class="nav-item" data-view="reports">
+          <i data-lucide="bar-chart-2"></i>
+          <span>Reports</span>
+        </button>
+        <button type="button" class="nav-item" data-view="restrictions">
+          <i data-lucide="shield-alert"></i>
+          <span>Restrictions</span>
+        </button>
+        <button type="button" class="nav-item" data-view="settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </aside>
+ 
+    <main class="main">
+      <div class="sub-header">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <span class="bc-root">Quanty</span>
+          <i data-lucide="chevron-right" class="bc-sep"></i>
+          <span class="bc-page" id="bcPage">Focus</span>
+        </nav>
+        <div class="sub-header__right">
+          <span class="sub-date" id="subDate"></span>
+          <button type="button" class="icon-btn" id="notifBtn" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+          </button>
+        </div>
+      </div>
+ 
+      <!-- FOCUS -->
+      <section class="view active" id="view-focus">
+        <h1 class="page-title">Focus</h1>
+        <div class="card">
+          <h2 class="card-title">Current Task</h2>
+          <p class="focus-task-title" id="currentTaskTitle">No task yet</p>
+          <p class="field-hint" id="currentTaskDesc">Add tasks under My Lists or generate a plan.</p>
+          <button type="button" class="btn-grad" id="startFocusBtn">
+            <i data-lucide="play"></i>
+            <span id="focusButtonText">Start Focus Session</span>
+          </button>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Session Timer</h2>
+          <div class="timer-mono" id="timer">00:00:00</div>
+          <div class="timer-track">
+            <div class="timer-fill" id="timerProgressFill"></div>
+          </div>
+          <div class="status-pill status-ready" id="statusBadge">
+            <span class="status-dot" id="statusDot">●</span>
+            <span id="statusText">Ready</span>
+          </div>
+        </div>
+      </section>
+ 
+      <!-- MY LISTS -->
+      <section class="view" id="view-lists">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">My Lists</h1>
+            <p class="page-sub">Organize your work into focused collections</p>
+          </div>
+          <button type="button" class="btn-grad-sm" id="newListBtn">
+            <i data-lucide="plus"></i>
+            New List
+          </button>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Progress</h2>
+          <p class="field-hint" id="progressText" style="margin-bottom:10px;color:var(--tx-md);">0 / 0 tasks</p>
+          <div class="app-progress-track">
+            <div class="app-progress-fill" id="progressBarFill"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Generate Plan</h2>
+          <p class="field-hint">Введи цель — AI сам создаст план</p>
+          <div class="input-row" style="margin-top:12px;">
+            <input type="text" class="field" id="goalInput" placeholder="Your goal…" autocomplete="off" />
+            <button type="button" class="btn-add" id="generateBtn">Generate</button>
+          </div>
+          <p class="field-hint" style="margin-top:14px;">Focus duration</p>
+          <div class="deadline-grid">
+            <div>
+              <input type="number" class="field" id="hoursInput" min="0" max="24" value="1" />
+              <p class="field-hint">Hours</p>
+            </div>
+            <div>
+              <input type="number" class="field" id="minutesInput" min="0" max="59" value="0" />
+              <p class="field-hint">Minutes</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Task List</h2>
+          <div class="task-list-app" id="taskList"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Add Task</h2>
+          <div class="input-row">
+            <input type="text" class="field" id="newTaskInput" placeholder="New task…" autocomplete="off" />
+            <button type="button" class="btn-add" id="addTaskBtn">Add</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Today's Plan</h2>
+          <div class="today-list" id="todayPlan"></div>
+        </div>
+        <div class="lists-grid" style="margin-top:18px;">
+          <article class="list-card" id="listCardWork">
+            <div class="list-card__top">
+              <span class="list-dot" data-color="blue"></span>
+              <h3 class="list-card__name">Work Sprint</h3>
+              <button type="button" class="list-opts-btn" aria-label="Options"><i data-lucide="more-vertical"></i></button>
+            </div>
+            <div class="list-card__sep"></div>
+            <div class="list-card__meta">
+              <span class="meta-chip"><i data-lucide="check-square"></i><span id="metaWorkTasks">0 tasks</span></span>
+              <span class="meta-chip"><i data-lucide="clock"></i>Today</span>
+            </div>
+            <div class="list-empty" id="listCardWorkPreview">
+              <div class="list-empty__icon"><i data-lucide="clipboard"></i></div>
+              <p>No tasks yet</p>
+              <span>Nothing here yet.</span>
+            </div>
+            <button type="button" class="list-add-btn" data-list-add="work"><i data-lucide="plus"></i> Add task</button>
+          </article>
+          <article class="list-card" id="listCardIdeas">
+            <div class="list-card__top">
+              <span class="list-dot" data-color="indigo"></span>
+              <h3 class="list-card__name">Product Ideas</h3>
+              <button type="button" class="list-opts-btn" aria-label="Options"><i data-lucide="more-vertical"></i></button>
+            </div>
+            <div class="list-card__sep"></div>
+            <div class="list-card__meta">
+              <span class="meta-chip"><i data-lucide="check-square"></i>0 tasks</span>
+              <span class="meta-chip"><i data-lucide="clock"></i>This week</span>
+            </div>
+            <div class="list-empty">
+              <div class="list-empty__icon"><i data-lucide="clipboard"></i></div>
+              <p>Ideas bucket</p>
+              <span>Use My Lists above for real tasks.</span>
+            </div>
+            <button type="button" class="list-add-btn" data-focus-lists><i data-lucide="plus"></i> Add task</button>
+          </article>
+          <button type="button" class="list-card list-card--new" id="createListCard">
+            <div class="new-list-icon"><i data-lucide="plus"></i></div>
+            <span>Create new list</span>
+          </button>
+        </div>
+      </section>
+ 
+      <!-- INBOX -->
+      <section class="view" id="view-inbox">
+        <h1 class="page-title">Inbox</h1>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="input-row">
+            <input type="text" class="field" id="inboxInput" placeholder="Type a task and press Enter…" autocomplete="off" />
+            <button type="button" class="btn-add" id="inboxAddBtn">Add</button>
+          </div>
+        </div>
+        <div class="empty-wrap" id="inboxEmpty">
+          <div class="empty-icon-box"><i data-lucide="inbox"></i></div>
+          <p class="empty-title">Your inbox is clear</p>
+          <p class="empty-desc">Tasks you capture will appear here</p>
+        </div>
+        <div class="task-list-app" id="inboxList" style="display:none;padding:0 4px;"></div>
+      </section>
+ 
+      <!-- COMPLETED -->
+      <section class="view" id="view-completed">
+        <h1 class="page-title">Completed</h1>
+        <div class="empty-wrap" id="completedEmpty">
+          <div class="empty-icon-box"><i data-lucide="check-circle"></i></div>
+          <p class="empty-title">Nothing completed yet</p>
+          <p class="empty-desc">Finished tasks will show up here</p>
+        </div>
+        <div class="task-list-app" id="completedList" style="display:none;"></div>
+      </section>
+ 
+      <!-- REPORTS -->
+      <section class="view" id="view-reports">
+        <h1 class="page-title">Reports</h1>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Tasks Completed</span>
+            <span class="stat-value" id="repTasksDone">0</span>
+            <span class="stat-sub">total</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Focus Sessions</span>
+            <span class="stat-value" id="repSessions">0</span>
+            <span class="stat-sub">completed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Streak</span>
+            <span class="stat-value" id="repStreak">0</span>
+            <span class="stat-sub">days</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Active Days</span>
+            <span class="stat-value" id="repDays">0</span>
+            <span class="stat-sub">logged</span>
+          </div>
+        </div>
+        <div class="chart-card">
+          <p class="chart-label">Activity — Last 7 days</p>
+          <div class="chart-bars" id="chartBars"></div>
+          <p class="chart-hint">Based on completed tasks per day</p>
+        </div>
+      </section>
+ 
+      <!-- RESTRICTIONS -->
+      <section class="view" id="view-restrictions">
+        <h1 class="page-title">Focus Restrictions</h1>
+        <div class="card">
+          <h2 class="card-title">Set Daily Deadline</h2>
+          <input type="time" class="field" id="deadlineInput" />
+          <p class="field-hint">Your daily focus deadline</p>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Website Blocklist</h2>
+          <div class="input-row">
+            <input type="text" class="field" id="websiteInput" placeholder="Enter website URL" autocomplete="off" />
+            <button type="button" class="btn-add" id="addWebsiteBtn">Add</button>
+          </div>
+          <div class="tag-list" id="websiteTagList" aria-live="polite"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Program Blocklist</h2>
+          <div class="input-row">
+            <input type="text" class="field" id="programInput" placeholder="Enter program name" autocomplete="off" />
+            <button type="button" class="btn-add" id="addProgramBtn">Add</button>
+          </div>
+          <div class="tag-list" id="programTagList" aria-live="polite"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Break Allowance</h2>
+          <div class="input-row">
+            <input type="number" class="field" id="breakInput" placeholder="e.g. 15" min="0" max="120" />
+            <span class="field-unit">min / break</span>
+          </div>
+          <p class="field-hint">Maximum allowed break duration per session</p>
+        </div>
+      </section>
+ 
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings">
+        <h1 class="page-title">Settings</h1>
+        <div class="settings-list">
+          <button type="button" class="settings-row" data-settings="account">
+            <div class="settings-icon"><i data-lucide="user"></i></div>
+            <div class="settings-body">
+              <span class="settings-name">Account &amp; Profile</span>
+              <span class="settings-desc">Name, email, avatar, timezone</span>
+            </div>
+            <i data-lucide="chevron-right" class="settings-arrow"></i>
+          </button>
+          <button type="button" class="settings-row" data-settings="notifications">
+            <div class="settings-icon"><i data-lucide="bell"></i></div>
+            <div class="settings-body">
+              <span class="settings-name">Notifications</span>
+              <span class="settings-desc">Push, email, and in-app alerts</span>
+            </div>
+            <i data-lucide="chevron-right" class="settings-arrow"></i>
+          </button>
+          <button type="button" class="settings-row" data-settings="appearance">
+            <div class="settings-icon"><i data-lucide="sun"></i></div>
+            <div class="settings-body">
+              <span class="settings-name">Appearance</span>
+              <span class="settings-desc">Theme, density, accent color</span>
+            </div>
+            <i data-lucide="chevron-right" class="settings-arrow"></i>
+          </button>
+        </div>
+      </section>
+ 
+    </main>
+  </div>
+ 
+  <!-- FOCUS ANIMATION OVERLAY -->
+  <div id="focusOverlay" style="
+    position:fixed;inset:0;z-index:9999;
+    background: linear-gradient(135deg, #05d6c4, #00de80);
+    opacity:0;pointer-events:none;
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1);
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:16px;
+  ">
+    <div style="font-size:48px;font-weight:900;color:#000;letter-spacing:-2px;">⚡</div>
+    <div style="font-size:22px;font-weight:700;color:#000;">Focus activated</div>
+  </div>
+ 
+  <!-- Task detail modal -->
+  <div id="taskDetailModal" class="task-detail-modal hidden">
+    <div class="task-detail-card">
+      <button id="taskDetailClose" class="task-detail-close">×</button>
+      <h3 id="taskDetailTitle" class="task-detail-title"></h3>
+      <p id="taskDetailExpl" class="task-detail-expl"></p>
+    </div>
+  </div>
+
+  <script src="home.js"></script>
+  <script type="module">
+    import { runOnboarding } from "./onboarding.js";
+    // Run onboarding after home.js initialised the DOM
+    window.addEventListener("load", () => runOnboarding().catch(() => {}));
+  </script>
+</body>
+</html>
+ 

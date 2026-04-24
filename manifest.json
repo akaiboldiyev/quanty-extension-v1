@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Quanty",
+  "version": "0.1.1",
+  "description": "AI mentor: go to the goal without failure.",
+  "action": {
+    "default_title": "Quanty",
+    "default_icon": {
+      "128": "assets/Q.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/service_worker.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "tabs",
+    "scripting",
+    "sidePanel",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "side_panel": {
+    "default_path": "pages/sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content_script.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "pages/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "pages/*",
+        "assets/*",
+        "shared/*",
+        "background/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quanty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-brand">
+      <img src="../assets/Q.png" alt="Q" class="header-logo" id="spLogo" />
+      <span class="header-title">Quanty</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="chatBtn"     title="Ask AI">💬</button>
+      <button class="icon-btn" id="themeBtn"    title="Toggle theme">☀️</button>
+      <button class="icon-btn" id="homeBtn"     title="Open full app">⌂</button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- ── GOAL BAR ── -->
+  <div class="goal-bar">
+    <div class="goal-bar-left">
+      <span class="goal-pill">GOAL</span>
+      <span class="goal-text" id="spGoalText">Not set</span>
+    </div>
+    <span class="done-badge" id="spDoneBadge">0/0 Done</span>
+    <div class="goal-progress">
+      <div class="goal-progress-fill" id="spProgressFill"></div>
+    </div>
+  </div>
+
+  <!-- ── TASK CARD ── -->
+  <div class="task-card">
+    <span class="task-card-day"   id="spTaskDay">DAY 1</span>
+    <span class="task-card-title" id="spTaskTitle">No tasks</span>
+    <span class="task-card-hint"  id="spTaskHint">Enter a goal below to generate a plan</span>
+    <button class="btn-focus" id="spFocusBtn" disabled>▶ Start Focus</button>
+  </div>
+
+  <!-- ── TIMER ── -->
+  <div class="timer">
+    <div class="timer-value" id="spTimer">00:30:00</div>
+    <div class="timer-bar"></div>
+  </div>
+
+  <!-- ── AI PLAN ── -->
+  <div class="ai-plan">
+    <div class="ai-plan-header">
+      <span class="ai-plan-label">AI Plan</span>
+      <span class="ai-plan-status" id="spPlanStatusBadge"></span>
+    </div>
+    <div class="input-row">
+      <input class="input" id="spGoalInput" placeholder="e.g. learn JavaScript…" type="text" />
+      <button class="btn-send" id="spGenerateBtn">→</button>
+    </div>
+    <p class="hint" id="spPlanStatus"></p>
+  </div>
+
+  <!-- ── DAY NAVIGATOR ── -->
+  <div class="day-nav">
+    <button class="day-nav-arrow" id="spDayPrev">‹</button>
+    <span class="day-nav-label" id="spDayNavLabel">Day 1</span>
+    <button class="day-nav-arrow" id="spDayNext">›</button>
+  </div>
+
+  <!-- ── TASKS ── -->
+  <div class="tasks">
+    <div class="tasks-list"      id="spTasks"></div>
+    <div class="tasks-solution"  id="spSolutionWrap"></div>
+    <div class="tasks-add hidden" id="spAddRow">
+      <input class="input" id="spNewTask" placeholder="New task…" style="height:40px;padding:0 12px;" />
+      <button class="btn-send" id="spAddTaskBtn">+</button>
+    </div>
+    <button class="link-btn" id="spAddTaskToggle">+ Add task</button>
+  </div>
+
+  <!-- ── CHAT PANEL (slide overlay) ── -->
+  <div id="spChatPanel" class="chat-panel">
+    <div class="chat" id="spChatList"></div>
+    <footer class="footer">
+      <span class="footer-label">Ask AI</span>
+      <div class="footer-input-row">
+        <input class="footer-input" id="spChatInput" placeholder="Ask anything…" type="text" />
+        <button class="btn-send-round" id="spChatSend">→</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ── SETTINGS OVERLAY (centered modal) ── -->
+  <div class="settings-overlay" id="spSettingsOverlay">
+    <div class="settings" id="spSettings">
+      <div class="settings-header">
+        <span class="settings-title">Settings</span>
+        <button class="icon-btn" id="spSettingsClose">✕</button>
+      </div>
+
+      <label class="settings-label">Block level</label>
+      <div class="settings-row">
+        <button class="seg-btn" data-level="easy">🟢 Easy</button>
+        <button class="seg-btn active" data-level="medium">🟡 Medium</button>
+        <button class="seg-btn" data-level="hard">🔴 Hard</button>
+      </div>
+
+      <label class="settings-label">Daily limit (min)</label>
+      <div class="settings-row">
+        <input class="input" type="number" id="spDailyLimit" value="30" min="0" max="480" />
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <button class="btn-primary" id="spSaveSettings">Save settings</button>
+      <button class="link-btn" id="spResetBtn" style="margin-top:8px;text-align:center;width:100%;">Reset today</button>
+    </div>
+  </div>
+
+  <!-- ── PROOF MODAL ── -->
+  <div class="modal hidden" id="spProofModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-badge">Proof of Work</span>
+        <button class="icon-btn" id="spProofClose">✕</button>
+      </div>
+      <p class="modal-task"  id="spProofTask"></p>
+      <p class="modal-q"     id="spProofQ">Generating question…</p>
+      <div class="modal-timer" id="spProofTimer">60s</div>
+      <textarea class="modal-area" id="spProofArea"
+        placeholder="Answer in your own words…"
+        onpaste="return false" oncopy="return false"></textarea>
+      <button class="btn-primary" id="spProofSubmit">Submit answer</button>
+      <p class="hint" id="spProofFeedback"></p>
+    </div>
+  </div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

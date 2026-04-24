@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quanty — Blocked</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="blocked.css" />
+</head>
+<body>
+  <div class="blocked-shell">
+    <header class="blocked-top">
+      <div class="brand">
+        <div class="mark">Q</div>
+        <div>
+          <div class="title">Quanty</div>
+          <div class="subtitle">Limit exceeded</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-line">Return to task</div>
+        <div class="meta-task" id="returnTask">—</div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Your focus is protected</h2>
+        <p class="p" id="blockedReason">This site is blocked right now. Your goal is waiting.</p>
+        <div class="row">
+          <button id="openOptionsBtn" class="btn">Settings</button>
+          <button id="resetTodayBtn" class="btn primary">Reset today (dev)</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Quanty panel</h2>
+        <div id="quantyRoot"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="quanty_core.js"></script>
+  <script type="module" src="blocked.js"></script>
+</body>
+</html>
+
