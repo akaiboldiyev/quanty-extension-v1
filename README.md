@@ -18,8 +18,16 @@ Demo: > Demo: Video/GIF coming soon. For now: it darkens screen + neon #00C47A b
 3. Load unpacked → select folder → Pin icon
 
 ### Stack
-Chrome Extension MV3, Vanilla JS, Side Panel API. 100% offline, no tracking.
+### Privacy
+Quanty uses a backend to generate AI tasks and quiz questions. 
 
+What we send: Only your goal text like "Learn C++". 
+What we DON'T send: No personal data, no browsing history, no emails.
+What we store: Nothing. Requests are stateless.
+
+Why backend? To make the AI mentor actually smart instead of dumb templates.
+
+Don't trust me? The extension is open source. Check the code.
 ### Roadmap
 - [x] MVP with 3 blocking modes + quiz
 - [ ] AI Mentor chat 24/7
