@@ -17,7 +17,21 @@ Demo: > Demo: Video/GIF coming soon. For now: it darkens screen + neon #00C47A b
 2. Chrome → chrome://extensions → Dev mode ON
 3. Load unpacked → select folder → Pin icon
 
-### Stack
+### Tech Stack
+- Frontend: Chrome Extension Manifest V3, Vanilla JS, Side Panel API
+- Backend: Node.js + Express, hosted on [Render/Railway]
+- AI: Google Gemini 2.5 Flash API for generating tasks & quizzes
+
+### Privacy & Cost
+How it works: When you set a goal, only that text is sent to my backend → Gemini API → returns a task. That's it.
+
+What I collect: Nothing. No accounts, no emails, no browsing history, no logs. 
+Requests are stateless and not stored.
+
+Who pays for AI: I do. Testing credits cover ~10k tasks. If Quanty blows up, I'll add my own API key option later.
+
+Open Source: Don't trust me? Check /backend folder in the repo. No shady shit.
+
 ### Privacy
 Quanty uses a backend to generate AI tasks and quiz questions. 
 
