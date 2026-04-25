@@ -84,8 +84,12 @@ const headerGoal=document.getElementById("headerGoal"),headerGoalText=document.g
 // ── Focus animation ───────────────────────────────────────
 function playFocusAnimation() {
   if (!focusOverlay) return;
-  focusOverlay.style.pointerEvents="all"; focusOverlay.style.opacity="1";
-  setTimeout(()=>{ focusOverlay.style.opacity="0"; setTimeout(()=>{ focusOverlay.style.pointerEvents="none"; },700); },900);
+  focusOverlay.style.pointerEvents = "all";
+  focusOverlay.style.opacity = "1";
+  setTimeout(() => {
+    focusOverlay.style.opacity = "0";
+    setTimeout(() => { focusOverlay.style.pointerEvents = "none"; }, 700);
+  }, 900);
 }
 
 function refreshLucide() { if(typeof lucide!=="undefined"&&lucide.createIcons) lucide.createIcons(); }

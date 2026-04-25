@@ -11,7 +11,8 @@ export class HighlightBox {
       "border:2px solid " + ACCENT,
       "border-radius:14px",
       "box-shadow:0 0 20px rgba(0,242,255,.65)",
-      "transition:all 380ms cubic-bezier(.22,.61,.36,1)",
+      "opacity:0",
+    "transition:all 380ms cubic-bezier(.22,.61,.36,1)",
       "pointer-events:none",
     ].join(";");
   }

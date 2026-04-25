@@ -178,6 +178,33 @@ function startTimerLoop() {
   }, 1000);
 }
 
+// ── Focus animation ───────────────────────────────────────────
+function playFocusAnimation() {
+  let overlay = document.getElementById("sp-focus-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "sp-focus-overlay";
+    overlay.style.cssText = [
+      "position:fixed","inset:0","z-index:9999",
+      "background:linear-gradient(135deg,#05d6c4,#00de80)",
+      "opacity:0","pointer-events:none",
+      "transition:opacity 0.6s cubic-bezier(0.4,0,0.2,1)",
+      "display:flex","align-items:center","justify-content:center",
+      "flex-direction:column","gap:16px",
+    ].join(";");
+    overlay.innerHTML = `
+      <div style="font-size:48px;font-weight:900;color:#000;letter-spacing:-2px;">⚡</div>
+      <div style="font-size:22px;font-weight:700;color:#000;">Focus activated</div>
+    `;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.pointerEvents = "all";
+  overlay.style.opacity = "1";
+  setTimeout(() => {
+    overlay.style.opacity = "0";
+    setTimeout(() => { overlay.style.pointerEvents = "none"; }, 700);
+  }, 900);
+}
 $("spFocusBtn").addEventListener("click", async () => {
   if (!state.tasks.length) return;
   state.isActive = !state.isActive;
@@ -189,6 +216,7 @@ $("spFocusBtn").addEventListener("click", async () => {
     await chrome.storage.local.set({ [FOCUS_KEY]: { focusEndTime, totalTime: state.totalTime, active: true } });
     try { chrome.runtime.sendMessage({ type: "quanty:focusStart" }); } catch {}
     syncExtension();
+    playFocusAnimation();
   } else {
     await chrome.storage.local.set({ [FOCUS_KEY]: { focusEndTime: 0, totalTime: state.totalTime, active: false } });
     try { chrome.runtime.sendMessage({ type: "quanty:focusStop" }); } catch {}
@@ -523,31 +551,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-// ── INIT ──────────────────────────────────────────────────────
-async function init() {
-  fetch(`${PROXY_URL}/api/health`).catch(() => {});
-  await loadTheme();
-  await loadState();
-  // Restore timestamp-based focus state
-  try {
-    const got = await chrome.storage.local.get(["quanty_focus_end"]);
-    const foc = got["quanty_focus_end"];
-    if (foc && foc.active && foc.focusEndTime > Date.now()) {
-      state.isActive = true;
-      state.remainingTime = Math.max(0, Math.round((foc.focusEndTime - Date.now()) / 1000));
-      if (foc.totalTime) state.totalTime = foc.totalTime;
-    } else if (foc && !foc.active) {
-      state.isActive = false;
-    }
-  } catch {}
-  render();
-  startTimerLoop();
-  $("spLogo")?.addEventListener("error", e => { e.target.style.display = "none"; });
-}
 
-init().catch(console.error);
-
-    checkOnboarding();   // ← добавь эту строку
 // ====================== ONBOARDING (TabAI-style) ======================
 const onboardingSteps = [
   { selector: "#spGoalText, #spGoalInput", title: "🎯 Your main goal", text: "Here you set the goal that Quanty will use to keep you focused." },
@@ -624,3 +628,30 @@ async function finishOnboarding() {
     overlay?.remove(); box?.remove(); tooltip?.remove();
   }, 400);
 }
+
+
+
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  fetch(`${PROXY_URL}/api/health`).catch(() => {});
+  await loadTheme();
+  await loadState();
+  // Restore timestamp-based focus state
+  try {
+    const got = await chrome.storage.local.get(["quanty_focus_end"]);
+    const foc = got["quanty_focus_end"];
+    if (foc && foc.active && foc.focusEndTime > Date.now()) {
+      state.isActive = true;
+      state.remainingTime = Math.max(0, Math.round((foc.focusEndTime - Date.now()) / 1000));
+      if (foc.totalTime) state.totalTime = foc.totalTime;
+    } else if (foc && !foc.active) {
+      state.isActive = false;
+    }
+  } catch {}
+  render();
+  startTimerLoop();
+  $("spLogo")?.addEventListener("error", e => { e.target.style.display = "none"; });
+}
+
+init().then(() => checkOnboarding()).catch(console.error);

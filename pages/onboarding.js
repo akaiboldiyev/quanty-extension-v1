@@ -77,7 +77,7 @@ export async function runOnboarding() {
     Our goal: get you to real results without burning out.<br><br>
     <span style="color:#05d6c4;">AI builds your plan</span>, explains every step, and blocks distractions until you finish today's task.
   `;
-  await new Promise((resolve) => nextBtn.addEventListener("click", resolve, { once: true }));
+  await new Promise((resolve) => { nextBtn.onclick = () => resolve(); });
 
   // ── Highlight tour ──────────────────────────────────────
   const hl = new HighlightBox();
