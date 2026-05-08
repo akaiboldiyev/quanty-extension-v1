@@ -186,6 +186,26 @@ themeBtn?.addEventListener("click",()=>{ themeAlt=!themeAlt; document.documentEl
 
 // ── Init ──────────────────────────────────────────────────
 async function init() {
+  // ── Greeting (was inline <script> — moved here, no inline scripts in extensions) ──
+  (function() {
+    const h = new Date().getHours();
+    const el = document.getElementById('greetingTime');
+    if (el) {
+      if (h < 12)      el.textContent = 'GOOD MORNING';
+      else if (h < 17) el.textContent = 'GOOD AFTERNOON';
+      else if (h < 21) el.textContent = 'GOOD EVENING';
+      else             el.textContent = 'GOOD NIGHT';
+    }
+    const quotes = [
+      'Dedication knows no timezone. Keep building.',
+      'Every session counts. Make it matter.',
+      'Focus is a muscle. Train it daily.',
+      'One task at a time. That\'s the way.',
+    ];
+    const qEl = document.getElementById('greetingQuote');
+    if (qEl) qEl.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+  })();
+
   loadLocalState(); await loadTasks();
   // Restore timestamp-based focus state
   try {
@@ -359,9 +379,16 @@ function updateUI() {
 }
 function updateStatus(completed,total) {
   statusBadge.classList.remove("status-ready","status-locked","status-unlocked");
-  if(total===0){ statusDot.textContent="●"; statusText.textContent="Ready"; statusBadge.classList.add("status-ready"); }
-  else if(completed===total){ statusDot.textContent="✓"; statusText.textContent="Unlocked"; statusBadge.classList.add("status-unlocked"); }
-  else{ statusDot.textContent="●"; statusText.textContent=`Locked · ${completed}/${total}`; statusBadge.classList.add("status-locked"); }
+  if(total===0){
+    statusDot.textContent=""; statusDot.style.fontSize=""; // CSS draws the dot
+    statusText.textContent="Ready"; statusBadge.classList.add("status-ready");
+  } else if(completed===total){
+    statusDot.textContent="✓"; statusDot.style.fontSize="10px"; // show checkmark text
+    statusText.textContent="Unlocked"; statusBadge.classList.add("status-unlocked");
+  } else {
+    statusDot.textContent=""; statusDot.style.fontSize=""; // CSS draws the dot
+    statusText.textContent=`Locked · ${completed}/${total}`; statusBadge.classList.add("status-locked");
+  }
 }
 function updateTaskList() {
   if(state.tasks.length===0){ taskList.innerHTML='<p class="empty-message">No tasks yet — generate a plan or add one.</p>'; return; }

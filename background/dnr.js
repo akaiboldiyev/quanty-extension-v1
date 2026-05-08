@@ -19,16 +19,10 @@ function escapeRegex(s) {
 function toRegexFilter(domain) {
   const d = normalizeDomain(domain);
   if (!d) return null;
-  
- // YouTube: разреши только поиск
-  if (d === "youtube.com") {
-  return `^https?://([a-z0-9-]+\\.)*youtube\\.com/(?!results|search)`;
-  }
- // Google: разреши только поиск
-  if (d === "google.com") {
-  return `^https?://([a-z0-9-]+\\.)*google\\.com/(?!search|results)`;
-  }
-  
+
+  // YouTube and Google are always allowed — content_script handles hiding via CSS
+  if (d === "youtube.com" || d === "google.com") return null;
+
   return `^https?://([a-z0-9-]+\\.)*${escapeRegex(d)}/`;
 }
 

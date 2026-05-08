@@ -319,12 +319,86 @@
     }
   }
 
+  // ── Search interception (medium level) ────────────────────────────────────
+  // On YouTube and Google, intercept form submit and check query with AI.
+  // If AI says it's brainrot — block the search and show overlay.
+
+  const SEARCH_BLOCK_CSS_ID = "quanty-search-block";
+
+  function showSearchBlockOverlay(reason) {
+    if (document.getElementById(SEARCH_BLOCK_CSS_ID)) return;
+    const root = document.createElement("div");
+    root.id = SEARCH_BLOCK_CSS_ID;
+    root.style.cssText = `
+      position:fixed;inset:0;z-index:2147483647;
+      background:rgba(0,0,0,0.85);
+      display:flex;align-items:center;justify-content:center;
+      font-family:system-ui,sans-serif;
+    `;
+    root.innerHTML = `
+      <div style="background:#111;border:1px solid #333;border-radius:16px;padding:32px 28px;max-width:400px;text-align:center;color:#fff;">
+        <div style="font-size:32px;margin-bottom:12px;">🧠</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Don't waste your potential</div>
+        <div style="font-size:14px;color:#aaa;margin-bottom:20px;">${reason || "This search won't help you reach your goal."}</div>
+        <button id="quanty-search-unblock" style="
+          background:#fff;color:#000;border:none;border-radius:8px;
+          padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;margin-right:8px;
+        ">Search anyway</button>
+        <button id="quanty-search-close" style="
+          background:transparent;color:#aaa;border:1px solid #444;border-radius:8px;
+          padding:10px 24px;font-size:14px;cursor:pointer;
+        ">Back to work</button>
+      </div>
+    `;
+    root.querySelector("#quanty-search-unblock")?.addEventListener("click", () => {
+      root.remove();
+    });
+    root.querySelector("#quanty-search-close")?.addEventListener("click", () => {
+      chrome.runtime.sendMessage({ type: "quanty:closeTab" });
+    });
+    document.documentElement.appendChild(root);
+  }
+
+  function hookSearchForm() {
+    const input = document.querySelector('input[name="search_query"], input[name="q"]');
+    if (!input) return;
+    const form = input.closest("form");
+    if (!form || form._quantyHooked) return;
+    form._quantyHooked = true;
+    form.addEventListener("submit", async (e) => {
+      if (currentBlockLevel !== "medium") return;
+      const query = input.value.trim();
+      if (!query) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      try {
+        const res = await chrome.runtime.sendMessage({ type: "quanty:checkSearch", query });
+        if (res?.block) {
+          showSearchBlockOverlay(res.reason);
+        } else {
+          form._quantyHooked = false;
+          form.submit();
+        }
+      } catch {
+        form._quantyHooked = false;
+        form.submit();
+      }
+    }, true);
+  }
+
+  // Hook on load and after SPA navigations
+  function initSearchHook() {
+    hookSearchForm();
+    setTimeout(hookSearchForm, 1500);
+  }
+
   // ── Init ───────────────────────────────────────────────────────────────────
   // Apply YouTube hiding immediately based on stored level
   chrome.storage.local.get(["settings"]).then(got => {
     const level = got?.settings?.blockLevel || "medium";
     currentBlockLevel = level;
     updateYouTubeHiding(level);
+    initSearchHook();
   }).catch(() => {});
 
   setInterval(() => heartbeat().catch(() => {}), 1000);
@@ -335,9 +409,15 @@
   const _pushState = history.pushState.bind(history);
   history.pushState = (...args) => {
     _pushState(...args);
-    setTimeout(() => updateYouTubeHiding(currentBlockLevel), 500);
+    setTimeout(() => {
+      updateYouTubeHiding(currentBlockLevel);
+      initSearchHook();
+    }, 500);
   };
   window.addEventListener("popstate", () => {
-    setTimeout(() => updateYouTubeHiding(currentBlockLevel), 500);
+    setTimeout(() => {
+      updateYouTubeHiding(currentBlockLevel);
+      initSearchHook();
+    }, 500);
   });
 })();

@@ -526,6 +526,85 @@ body.theme-light .chat-msg-user { color: #fff; }
    ══════════════════════════════════════ */
 .hidden { display: none !important; }
 
+/* ══════════════════════════════════════
+   TYPING INDICATOR (Bouncing Dots)
+   ══════════════════════════════════════ */
+.chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--chat-ai-border);
+  width: fit-content;
+  min-width: 56px;
+}
+.chat-typing .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+.chat-typing .dot:nth-child(1) { animation-delay: 0s; }
+.chat-typing .dot:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-7px); opacity: 1; }
+}
+
+/* ══════════════════════════════════════
+   PLAN GENERATION OVERLAY
+   ══════════════════════════════════════ */
+.plan-gen-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.plan-gen-overlay.is-visible {
+  opacity: 1; pointer-events: all;
+}
+.plan-gen-icon {
+  font-size: 40px;
+  animation: spin-icon 2.5s ease-in-out infinite;
+}
+@keyframes spin-icon {
+  0%,100% { transform: scale(1) rotate(0deg); }
+  50%      { transform: scale(1.15) rotate(10deg); }
+}
+.plan-gen-label {
+  font-size: 16px; font-weight: 800;
+  color: var(--green); letter-spacing: -0.3px;
+}
+.plan-gen-dots {
+  display: flex; gap: 8px;
+}
+.plan-gen-dots .dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--green);
+  animation: plan-dot-pulse 1.4s ease-in-out infinite;
+}
+.plan-gen-dots .dot:nth-child(1) { animation-delay: 0s;    background: #10b981; }
+.plan-gen-dots .dot:nth-child(2) { animation-delay: 0.2s;  background: #34d399; }
+.plan-gen-dots .dot:nth-child(3) { animation-delay: 0.4s;  background: #00c47a; }
+.plan-gen-dots .dot:nth-child(4) { animation-delay: 0.6s;  background: #34d399; }
+.plan-gen-dots .dot:nth-child(5) { animation-delay: 0.8s;  background: #10b981; }
+
+@keyframes plan-dot-pulse {
+  0%, 60%, 100% { transform: scaleY(1); opacity: 0.35; }
+  30%            { transform: scaleY(2.0); opacity: 1; }
+}
+.plan-gen-sub {
+  font-size: 12px; color: var(--muted2);
+  font-weight: 500; letter-spacing: 0.03em;
+}
+
 #quanty-onboarding-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(24, 26, 28, 0.92); z-index: 99999;

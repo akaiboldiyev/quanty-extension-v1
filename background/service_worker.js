@@ -9,7 +9,7 @@ import {
 import { ensureRedirectRules, clearRedirectRules } from "./dnr.js";
 import { buildCoachMessage } from "./coach.js";
 
-const PROXY = "https://quanty-proxy-production.up.railway.app";
+const PROXY = "https://quanty-proxy-production.up.railway.app"
 
 const STORAGE_KEYS = {
   settings: "settings",
@@ -176,7 +176,8 @@ async function handleHeartbeat({ tabId, url, visible }) {
     await setRuntime(rt2);
     try { await chrome.tabs.reload(tabId); } catch { /* ignore */ }
   } else {
-    await setDnrState(rt2, !!settings.redirectAlwaysOn, settings);
+    const shouldBlock = !!settings.redirectAlwaysOn || settings.blockLevel === "hard";
+    await setDnrState(rt2, shouldBlock, settings);
     await setRuntime(rt2);
   }
 
@@ -321,10 +322,35 @@ async function aiChatReply({ text, tasks }) {
   return "Focus on your current task. Small consistent steps beat big plans.";
 }
 
+// ── AI: Check search query for brainrot ──────────────────────
+async function checkSearchQuery(query) {
+  if (!query || query.trim().length < 2) return { block: false };
+  try {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 10000);
+    const r = await fetch(`${PROXY}/api/check-search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+      signal: ctrl.signal,
+    });
+    if (!r.ok) return { block: false };
+    return await r.json(); // { block: true/false, reason: "..." }
+  } catch {
+    return { block: false };
+  }
+}
+
 // ── message handler ──────────────────────────────────────────
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   (async () => {
     if (!msg || typeof msg !== "object") return;
+
+    if (msg.type === "quanty:checkSearch") {
+      const result = await checkSearchQuery(msg.query || "");
+      sendResponse(result);
+      return;
+    }
 
     if (msg.type === "quanty:getSettings") {
       sendResponse({ ok: true, settings: await getSettings() });

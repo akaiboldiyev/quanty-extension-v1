@@ -395,15 +395,32 @@ async function generatePlan() {
   const goal = ($("spGoalInput").value||"").trim();
   if (!goal) return;
   $("spGenerateBtn").disabled = true;
-  $("spPlanStatus").textContent = "⏳ Building plan…";
+  $("spPlanStatus").textContent = "";
   $("spPlanStatusBadge").textContent = "";
+
+  // Show generation overlay
+  const overlay = $("spPlanGenOverlay");
+  const sub     = $("spPlanGenSub");
+  const subTexts = ["Talking to AI…", "Analysing your goal…", "Crafting daily steps…", "Almost there…"];
+  let subIdx = 0;
+  overlay.classList.add("is-visible");
+  const subInterval = setInterval(() => {
+    subIdx = (subIdx + 1) % subTexts.length;
+    sub.textContent = subTexts[subIdx];
+  }, 1600);
+
   let titles = null;
   try {
     const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 22000);
     const r = await fetch(`${PROXY_URL}/api/generate-plan`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ goal, deadlineHours:0, deadlineMinutes:30 }), signal: ctrl.signal });
     if (r.ok) { const d = await r.json(); if (Array.isArray(d.tasks) && d.tasks.length) titles = d.tasks.map(String); }
   } catch { /* fallback */ }
-  if (!titles) { $("spPlanStatus").textContent = "📋 Using local plan…"; titles = getLocalPlan(goal); }
+  if (!titles) { titles = getLocalPlan(goal); }
+
+  clearInterval(subInterval);
+  sub.textContent = `✓ ${(titles||[]).length} tasks ready!`;
+  setTimeout(() => overlay.classList.remove("is-visible"), 700);
+
   state.tasks = makeTasks(titles); state.goal = goal; state.currentDay = 1;
   $("spGoalText").textContent = goal; $("spGoalInput").value = "";
   $("spPlanStatus").textContent = `✓ ${state.tasks.length} tasks ready`;
@@ -460,17 +477,28 @@ function addMsg(role, text) {
   div.className = role === "user" ? "chat-msg-user" : "chat-msg-ai";
   div.style.whiteSpace = "pre-wrap";
   div.textContent = text;
-
-  // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
   const chatList = $("spChatList");
   if (chatList) {
     chatList.appendChild(div);
-    chatList.scrollTo({
-      top: chatList.scrollHeight,
-      behavior: "smooth"
-    });
+    chatList.scrollTo({ top: chatList.scrollHeight, behavior: "smooth" });
   }
-  // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+}
+
+function showTypingIndicator() {
+  const chatList = $("spChatList");
+  if (!chatList) return null;
+  const el = document.createElement("div");
+  el.className = "chat-typing";
+  el.id = "spTypingDots";
+  el.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+  chatList.appendChild(el);
+  chatList.scrollTo({ top: chatList.scrollHeight, behavior: "smooth" });
+  return el;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById("spTypingDots");
+  if (el) el.remove();
 }
 
 async function sendChat() {
@@ -479,6 +507,8 @@ async function sendChat() {
 
   addMsg("user", text);
   $("spChatInput").value = "";
+
+  showTypingIndicator();
 
   try {
     const ctrl = new AbortController();
@@ -489,15 +519,16 @@ async function sendChat() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text,
-        // lang: "en" ← УДАЛИЛИ
         tasks: state.tasks.slice(0, 8).map(t => t.title || t.text)
       }),
       signal: ctrl.signal,
     });
 
     const d = await r.json();
+    removeTypingIndicator();
     addMsg("ai", d.reply || "No response.");
   } catch {
+    removeTypingIndicator();
     addMsg("ai", "Could not reach AI. Check your connection.");
   }
 }
