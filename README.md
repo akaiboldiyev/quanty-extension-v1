@@ -13,7 +13,7 @@ Demo: > Demo: Video/GIF coming soon. For now: it darkens screen + neon #00C47A b
 4. Pass Quiz to Unlock → 1 question, 60 sec, no copy-paste. Fail = +15min lock.
 
 ### Install
-1. [Download ZIP](ссылка на Releases)
+1. https://github.com/akaiboldiyev/quanty-extension-v1/archive/refs/heads/main.zip
 2. Chrome → chrome://extensions → Dev mode ON
 3. Load unpacked → select folder → Pin icon
 
